@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Medidor - Dias sin Azúcar</title>
+    
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="SugarFree">
+    <link rel="icon" type="image/png" href="assets/icons/favicon.png">
+    <link rel="apple-touch-icon" href="assets/icons/favicon.png"> 
+    
+    <link rel="manifest" href='data:application/manifest+json,{"name":"SugarFree Tracker","short_name":"SugarFree","start_url":".","display":"standalone","background_color":"#f4f7f6","theme_color":"#48bb78","icons":[{"src":"https://cdn-icons-png.flaticon.com/512/3068/3068321.png","sizes":"512x512","type":"image/png"}]}'>
+
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<div class="container">
+    <div class="card">
+        <div class="calendar-header">
+            <button class="btn-nav" id="prevMonth">&lt;</button>
+            <h2 id="monthYearTitle">...</h2>
+            <button class="btn-nav" id="nextMonth">&gt;</button>
+        </div>
+        <div class="weekdays">
+            <div>Dom</div><div>Lun</div><div>Mar</div><div>Mié</div><div>Jue</div><div>Vie</div><div>Sáb</div>
+        </div>
+        <div class="days-grid" id="daysGrid"></div>
+    </div>
+
+    <div class="card dashboard">
+        <div>
+            <h3 style="font-size: 1.15rem; font-weight:700;">Progreso del Mes</h3>
+            <p style="font-size: 0.85rem; color: var(--text-muted); margin-top: 2px;">Días sin azúcar transcurridos</p>
+            
+            <div class="gauge-container">
+                <svg class="gauge-svg" width="160" height="160">
+                    <circle class="gauge-bg" cx="80" cy="80" r="70"></circle>
+                    <circle class="gauge-progress" id="gaugeProgress" cx="80" cy="80" r="70"></circle>
+                </svg>
+                <div class="gauge-text" id="gaugeText">0%</div>
+            </div>
+
+            <div class="streak-badge" id="streakText">🔥 Racha actual: 0 días</div>
+            <p class="feedback-msg" id="feedbackMsg">...</p>
+        </div>
+
+        <div>
+            <button id="btnInstall">📲 Instalar en este Dispositivo</button>
+
+            <div class="data-actions">
+                <button class="btn-action" id="btnExport">📤 Exportar</button>
+                <button class="btn-action" onclick="document.getElementById('importFile').click()">📥 Importar</button>
+                <input type="file" id="importFile" accept=".json">
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>
