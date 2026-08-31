@@ -3,6 +3,7 @@
     "start": "servor --reload"
   },
   "dependencies": {
+    "@supabase/supabase-js": "^2.112.4",
     "servor": "^4.0.2"
   }
 }
