@@ -1,17 +1,12 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
   <meta charset="UTF-8" />
 
-  <meta
-    name="viewport"
-    content="width=device-width, initial-scale=1.0"
-  />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-  <meta
-    name="theme-color"
-    content="#101827"
-  />
+  <meta name="theme-color" content="#101827" />
 
   <title>Sin Azúcar</title>
   <link rel="icon" type="image/png" href="assets/icons/icon.png">
@@ -22,23 +17,38 @@
 <body>
 
   <div class="app">
-
+    <!---->
     <header class="topbar">
 
       <div>
-        <p class="mini-title">MI RETO PERSONAL</p>
-        <h1>🍎 Sin Azúcar</h1>
+        <p class="mini-title">
+          MI RETO PERSONAL
+        </p>
+
+        <h1>
+          🍎 Sin Azúcar
+        </h1>
+
+        <small id="userEmail">
+          Cargando...
+        </small>
       </div>
 
-      <button
-        id="themeBtn"
-        class="icon-btn"
-        aria-label="Cambiar tema"
-      >
-        🌙
-      </button>
+
+      <div class="topbar-actions">
+
+        <button id="themeBtn" class="icon-btn" aria-label="Cambiar tema">
+          🌙
+        </button>
+
+        <button id="logoutBtn" class="icon-btn" aria-label="Cerrar sesión" title="Cerrar sesión">
+          🚪
+        </button>
+
+      </div>
 
     </header>
+    <!---->
 
     <section class="hero">
 
@@ -127,10 +137,7 @@
 
       <div class="progress-bar">
 
-        <div
-          id="progressFill"
-          class="progress-fill"
-        ></div>
+        <div id="progressFill" class="progress-fill"></div>
 
       </div>
 
@@ -140,10 +147,7 @@
 
       <div class="calendar-header">
 
-        <button
-          id="prevMonth"
-          class="calendar-btn"
-        >
+        <button id="prevMonth" class="calendar-btn">
           ←
         </button>
 
@@ -159,10 +163,7 @@
 
         </div>
 
-        <button
-          id="nextMonth"
-          class="calendar-btn"
-        >
+        <button id="nextMonth" class="calendar-btn">
           →
         </button>
 
@@ -180,10 +181,7 @@
 
       </div>
 
-      <div
-        id="calendar"
-        class="calendar"
-      ></div>
+      <div id="calendar" class="calendar"></div>
 
     </section>
 
@@ -212,10 +210,7 @@
         🏅 Logros
       </h3>
 
-      <div
-        id="achievements"
-        class="achievements"
-      ></div>
+      <div id="achievements" class="achievements"></div>
 
     </section>
 
@@ -259,17 +254,11 @@
   </div>
 
 
-  <div
-    id="modal"
-    class="modal hidden"
-  >
+  <div id="modal" class="modal hidden">
 
     <div class="modal-box">
 
-      <button
-        id="closeModal"
-        class="close-modal"
-      >
+      <button id="closeModal" class="close-modal">
         ×
       </button>
 
@@ -287,17 +276,11 @@
 
       <div class="modal-buttons">
 
-        <button
-          id="successBtn"
-          class="success-btn"
-        >
+        <button id="successBtn" class="success-btn">
           ✅ Sí, cumplí
         </button>
 
-        <button
-          id="failedBtn"
-          class="failed-btn"
-        >
+        <button id="failedBtn" class="failed-btn">
           ❌ No cumplí
         </button>
 
@@ -312,13 +295,16 @@
   </div>
 
 
-  <div
-    id="toast"
-    class="toast"
-  ></div>
+  <div id="toast" class="toast"></div>
 
 
-  <script src="script.js"></script>
+  <script src="./script.js"></script>
+
+  <script
+      type="module"
+      src="./authGuard.js"
+  ></script>
 
 </body>
+
 </html>
