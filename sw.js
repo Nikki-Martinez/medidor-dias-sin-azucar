@@ -1,5 +1,5 @@
 const CACHE_NAME =
-  "sin-azucar-v1";
+  "sin-azucar-v2";
 
 const FILES = [
   "./",
