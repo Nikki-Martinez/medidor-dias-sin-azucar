@@ -1,298 +1,425 @@
-const calendar = document.getElementById("calendar");
-
-const monthTitle =
-  document.getElementById("monthTitle");
-
-const monthSubtitle =
-  document.getElementById("monthSubtitle");
-
-const prevMonthBtn =
-  document.getElementById("prevMonth");
-
-const nextMonthBtn =
-  document.getElementById("nextMonth");
-
-const modal =
-  document.getElementById("modal");
-
-const closeModalBtn =
-  document.getElementById("closeModal");
-
-const modalDate =
-  document.getElementById("modalDate");
-
-const successBtn =
-  document.getElementById("successBtn");
-
-const failedBtn =
-  document.getElementById("failedBtn");
-
-const currentStreakElement =
-  document.getElementById("currentStreak");
-
-const bestStreakElement =
-  document.getElementById("bestStreak");
-
-const successDaysElement =
-  document.getElementById("successDays");
-
-const failedDaysElement =
-  document.getElementById("failedDays");
-
-const progressFill =
-  document.getElementById("progressFill");
-
-const progressText =
-  document.getElementById("progressText");
-
-const totalRegistered =
-  document.getElementById("totalRegistered");
-
-const successPercentage =
-  document.getElementById("successPercentage");
-
-const motivation =
-  document.getElementById("motivation");
-
-const achievementsContainer =
-  document.getElementById("achievements");
-
-const themeBtn =
-  document.getElementById("themeBtn");
-
-const toast =
-  document.getElementById("toast");
+import { supabase } from "./supabaseClient.js";
 
 
 /* =========================
-   FECHA ACTUAL
+   ELEMENTOS DEL DOM
 ========================= */
 
-function getToday() {
+const calendar =
+    document.getElementById("calendar");
 
-  const date = new Date();
+const monthTitle =
+    document.getElementById("monthTitle");
 
-  date.setHours(
-    0,
-    0,
-    0,
-    0
-  );
+const monthSubtitle =
+    document.getElementById("monthSubtitle");
 
-  return date;
+const prevMonthBtn =
+    document.getElementById("prevMonth");
 
-}
+const nextMonthBtn =
+    document.getElementById("nextMonth");
+
+const modal =
+    document.getElementById("modal");
+
+const closeModalBtn =
+    document.getElementById("closeModal");
+
+const modalDate =
+    document.getElementById("modalDate");
+
+const successBtn =
+    document.getElementById("successBtn");
+
+const failedBtn =
+    document.getElementById("failedBtn");
+
+const currentStreakElement =
+    document.getElementById("currentStreak");
+
+const bestStreakElement =
+    document.getElementById("bestStreak");
+
+const successDaysElement =
+    document.getElementById("successDays");
+
+const failedDaysElement =
+    document.getElementById("failedDays");
+
+const progressFill =
+    document.getElementById("progressFill");
+
+const progressText =
+    document.getElementById("progressText");
+
+const totalRegistered =
+    document.getElementById("totalRegistered");
+
+const successPercentage =
+    document.getElementById("successPercentage");
+
+const motivation =
+    document.getElementById("motivation");
+
+const achievementsContainer =
+    document.getElementById("achievements");
+
+const themeBtn =
+    document.getElementById("themeBtn");
+
+const toast =
+    document.getElementById("toast");
 
 
-let today =
-  getToday();
+/* =========================
+   ESTADO GLOBAL
+========================= */
 
+let currentUser = null;
 
-let currentYear =
-  today.getFullYear();
-
-let currentMonth =
-  today.getMonth();
+let records = {};
 
 let selectedDate = null;
 
 
-/* =========================
-   MESES
-========================= */
+function getToday() {
 
-const MONTHS = [
-  "enero",
-  "febrero",
-  "marzo",
-  "abril",
-  "mayo",
-  "junio",
-  "julio",
-  "agosto",
-  "septiembre",
-  "octubre",
-  "noviembre",
-  "diciembre"
-];
+    const date =
+        new Date();
 
+    date.setHours(
+        0,
+        0,
+        0,
+        0
+    );
 
-/* =========================
-   FRASES
-========================= */
-
-const motivations = [
-
-  "No necesitas hacerlo perfecto. Solo cumplir hoy.",
-
-  "Un día más es una victoria más. 🔥",
-
-  "Tu yo del futuro agradecerá lo que haces hoy.",
-
-  "El antojo dura minutos. Tu progreso dura mucho más.",
-
-  "Hoy no estás perdiendo azúcar. Estás ganando disciplina.",
-
-  "No rompas una racha por unos minutos de antojo.",
-
-  "Cada día que cumples hace más fuerte el hábito.",
-
-  "Tu objetivo no es sufrir. Es recuperar el control.",
-
-  "Pequeñas decisiones producen grandes cambios.",
-
-  "Lo difícil de hoy será normal mañana.",
-
-  "No negocies con el antojo. Tú decides.",
-
-  "Otro día limpio. Otro punto para ti. 🏆"
-
-];
-
-
-/* =========================
-   LOGROS
-========================= */
-
-const achievements = [
-
-  {
-    days: 3,
-    icon: "🌱",
-    title: "Comenzando"
-  },
-
-  {
-    days: 7,
-    icon: "🔥",
-    title: "Una semana"
-  },
-
-  {
-    days: 15,
-    icon: "⚡",
-    title: "Imparable"
-  },
-
-  {
-    days: 30,
-    icon: "🏆",
-    title: "30 días"
-  },
-
-  {
-    days: 60,
-    icon: "💎",
-    title: "Disciplina"
-  },
-
-  {
-    days: 100,
-    icon: "👑",
-    title: "Leyenda"
-  }
-
-];
-
-
-/* =========================
-   LOCAL STORAGE
-========================= */
-
-let records =
-  JSON.parse(
-    localStorage.getItem(
-      "sugarFreeRecords"
-    )
-  ) || {};
-
-
-function saveRecords() {
-
-  localStorage.setItem(
-    "sugarFreeRecords",
-    JSON.stringify(records)
-  );
-
+    return date;
 }
 
 
+let today =
+    getToday();
+
+let currentYear =
+    today.getFullYear();
+
+let currentMonth =
+    today.getMonth();
+
+
 /* =========================
-   UTILIDADES DE FECHA
+   DATOS FIJOS
+========================= */
+
+const MONTHS = [
+    "enero",
+    "febrero",
+    "marzo",
+    "abril",
+    "mayo",
+    "junio",
+    "julio",
+    "agosto",
+    "septiembre",
+    "octubre",
+    "noviembre",
+    "diciembre"
+];
+
+
+const motivations = [
+    "No necesitas hacerlo perfecto. Solo cumplir hoy.",
+    "Un día más es una victoria más. 🔥",
+    "Tu yo del futuro agradecerá lo que haces hoy.",
+    "El antojo dura minutos. Tu progreso dura mucho más.",
+    "Hoy no estás perdiendo azúcar. Estás ganando disciplina.",
+    "No rompas una racha por unos minutos de antojo.",
+    "Cada día que cumples hace más fuerte el hábito.",
+    "Tu objetivo no es sufrir. Es recuperar el control.",
+    "Pequeñas decisiones producen grandes cambios.",
+    "Lo difícil de hoy será normal mañana.",
+    "No negocies con el antojo. Tú decides.",
+    "Otro día limpio. Otro punto para ti. 🏆"
+];
+
+
+const achievements = [
+    {
+        days: 3,
+        icon: "🌱",
+        title: "Comenzando"
+    },
+    {
+        days: 7,
+        icon: "🔥",
+        title: "Una semana"
+    },
+    {
+        days: 15,
+        icon: "⚡",
+        title: "Imparable"
+    },
+    {
+        days: 30,
+        icon: "🏆",
+        title: "30 días"
+    },
+    {
+        days: 60,
+        icon: "💎",
+        title: "Disciplina"
+    },
+    {
+        days: 100,
+        icon: "👑",
+        title: "Leyenda"
+    }
+];
+
+
+/* =========================
+   FECHAS
 ========================= */
 
 function getDateKey(date) {
 
-  const year =
-    date.getFullYear();
+    const year =
+        date.getFullYear();
 
-  const month =
-    String(
-      date.getMonth() + 1
-    ).padStart(
-      2,
-      "0"
-    );
+    const month =
+        String(
+            date.getMonth() + 1
+        ).padStart(
+            2,
+            "0"
+        );
 
-  const day =
-    String(
-      date.getDate()
-    ).padStart(
-      2,
-      "0"
-    );
+    const day =
+        String(
+            date.getDate()
+        ).padStart(
+            2,
+            "0"
+        );
 
-  return `${year}-${month}-${day}`;
-
+    return `${year}-${month}-${day}`;
 }
 
 
 function createDateFromKey(key) {
 
-  const [
-    year,
-    month,
-    day
-  ] =
-    key
-      .split("-")
-      .map(Number);
+    const [
+        year,
+        month,
+        day
+    ] =
+        key
+            .split("-")
+            .map(Number);
 
-  const date =
-    new Date(
-      year,
-      month - 1,
-      day
+    const date =
+        new Date(
+            year,
+            month - 1,
+            day
+        );
+
+    date.setHours(
+        0,
+        0,
+        0,
+        0
     );
 
-  date.setHours(
-    0,
-    0,
-    0,
-    0
-  );
-
-  return date;
-
+    return date;
 }
 
 
 function isToday(date) {
 
-  today =
-    getToday();
+    today =
+        getToday();
 
-  return (
-    date.getFullYear() ===
-      today.getFullYear() &&
+    return (
+        date.getFullYear() ===
+            today.getFullYear() &&
 
-    date.getMonth() ===
-      today.getMonth() &&
+        date.getMonth() ===
+            today.getMonth() &&
 
-    date.getDate() ===
-      today.getDate()
-  );
+        date.getDate() ===
+            today.getDate()
+    );
+}
 
+
+/* =========================
+   OBTENER USUARIO
+========================= */
+
+async function getCurrentUser() {
+
+    const {
+        data: {
+            user
+        },
+        error
+    } =
+        await supabase.auth
+            .getUser();
+
+
+    if (error) {
+
+        console.error(
+            "Error obteniendo usuario:",
+            error
+        );
+
+        return null;
+    }
+
+
+    return user;
+}
+
+
+/* =========================
+   CARGAR REGISTROS
+========================= */
+
+async function loadRecords() {
+
+    if (!currentUser) {
+        return;
+    }
+
+
+    const {
+        data,
+        error
+    } =
+        await supabase
+            .from("registros")
+            .select(
+                "fecha, estado, fecha_registro"
+            )
+            .eq(
+                "usuario_id",
+                currentUser.id
+            );
+
+
+    if (error) {
+
+        console.error(
+            "Error cargando registros:",
+            error
+        );
+
+        showToast(
+            "No se pudieron cargar tus registros."
+        );
+
+        return;
+    }
+
+
+    records = {};
+
+
+    data.forEach(
+        row => {
+
+            records[row.fecha] = {
+                status: row.estado,
+                registeredAt:
+                    row.fecha_registro
+            };
+
+        }
+    );
+
+
+    renderCalendar();
+
+    updateStats();
+}
+
+
+/* =========================
+   GUARDAR REGISTRO
+========================= */
+
+async function saveRecord(
+    date,
+    status
+) {
+
+    if (!currentUser) {
+
+        showToast(
+            "No hay una sesión válida."
+        );
+
+        return false;
+    }
+
+
+    const key =
+        getDateKey(date);
+
+
+    const {
+        error
+    } =
+        await supabase
+            .from("registros")
+            .insert({
+                usuario_id:
+                    currentUser.id,
+
+                fecha:
+                    key,
+
+                estado:
+                    status
+            });
+
+
+    if (error) {
+
+        console.error(
+            "Error guardando registro:",
+            error
+        );
+
+
+        if (
+            error.code ===
+            "23505"
+        ) {
+
+            showToast(
+                "🔒 Ese día ya fue registrado."
+            );
+
+        } else {
+
+            showToast(
+                "No se pudo guardar el registro."
+            );
+
+        }
+
+
+        return false;
+    }
+
+
+    return true;
 }
 
 
@@ -302,182 +429,166 @@ function isToday(date) {
 
 function renderCalendar() {
 
-  today =
-    getToday();
+    today =
+        getToday();
 
-  calendar.innerHTML = "";
+    calendar.innerHTML = "";
 
-  monthTitle.textContent =
-    `${MONTHS[currentMonth]} ${currentYear}`;
-
-
-  const firstDay =
-    new Date(
-      currentYear,
-      currentMonth,
-      1
-    );
-
-  const lastDay =
-    new Date(
-      currentYear,
-      currentMonth + 1,
-      0
-    );
-
-  const totalDays =
-    lastDay.getDate();
-
-  const startingDay =
-    firstDay.getDay();
+    monthTitle.textContent =
+        `${MONTHS[currentMonth]} ${currentYear}`;
 
 
-  /* ESPACIOS VACÍOS */
+    const firstDay =
+        new Date(
+            currentYear,
+            currentMonth,
+            1
+        );
 
-  for (
-    let i = 0;
-    i < startingDay;
-    i++
-  ) {
+    const lastDay =
+        new Date(
+            currentYear,
+            currentMonth + 1,
+            0
+        );
 
-    const emptyDay =
-      document.createElement("div");
+    const totalDays =
+        lastDay.getDate();
 
-    emptyDay.classList.add(
-      "day",
-      "empty"
-    );
-
-    calendar.appendChild(
-      emptyDay
-    );
-
-  }
+    const startingDay =
+        firstDay.getDay();
 
 
-  /* DÍAS DEL MES */
-
-  for (
-    let day = 1;
-    day <= totalDays;
-    day++
-  ) {
-
-    const date =
-      new Date(
-        currentYear,
-        currentMonth,
-        day
-      );
-
-    date.setHours(
-      0,
-      0,
-      0,
-      0
-    );
-
-
-    const key =
-      getDateKey(date);
-
-
-    const dayElement =
-      document.createElement("button");
-
-    dayElement.classList.add(
-      "day"
-    );
-
-    dayElement.textContent =
-      day;
-
-
-    /* MARCAR HOY */
-
-    if (
-      isToday(date)
+    for (
+        let i = 0;
+        i < startingDay;
+        i++
     ) {
 
-      dayElement.classList.add(
-        "today"
-      );
+        const emptyDay =
+            document.createElement(
+                "div"
+            );
 
+        emptyDay.classList.add(
+            "day",
+            "empty"
+        );
+
+        calendar.appendChild(
+            emptyDay
+        );
     }
 
 
-    /* DÍA YA REGISTRADO */
-
-    if (
-      records[key]
+    for (
+        let day = 1;
+        day <= totalDays;
+        day++
     ) {
 
-      dayElement.classList.add(
-        records[key].status
-      );
+        const date =
+            new Date(
+                currentYear,
+                currentMonth,
+                day
+            );
 
-      dayElement.classList.add(
-        "locked"
-      );
+        date.setHours(
+            0,
+            0,
+            0,
+            0
+        );
 
+
+        const key =
+            getDateKey(date);
+
+
+        const dayElement =
+            document.createElement(
+                "button"
+            );
+
+        dayElement.classList.add(
+            "day"
+        );
+
+        dayElement.textContent =
+            day;
+
+
+        if (
+            isToday(date)
+        ) {
+
+            dayElement.classList.add(
+                "today"
+            );
+        }
+
+
+        if (
+            records[key]
+        ) {
+
+            dayElement.classList.add(
+                records[key].status
+            );
+
+            dayElement.classList.add(
+                "locked"
+            );
+        }
+
+
+        /*
+        SOLO HOY SE PUEDE MARCAR
+        */
+
+        if (
+            !isToday(date)
+        ) {
+
+            dayElement.classList.add(
+                "future"
+            );
+
+            dayElement.disabled =
+                true;
+        }
+
+
+        /*
+        SI HOY YA FUE REGISTRADO,
+        TAMBIÉN SE BLOQUEA
+        */
+
+        if (
+            isToday(date) &&
+            records[key]
+        ) {
+
+            dayElement.disabled =
+                true;
+        }
+
+
+        dayElement.addEventListener(
+            "click",
+            () =>
+                selectDay(date)
+        );
+
+
+        calendar.appendChild(
+            dayElement
+        );
     }
 
 
-    /*
-      REGLA PRINCIPAL:
-
-      SOLO EL DÍA ACTUAL
-      PUEDE REGISTRARSE.
-
-      Ayer -> bloqueado
-      Mañana -> bloqueado
-    */
-
-    if (
-      !isToday(date)
-    ) {
-
-      dayElement.classList.add(
-        "future"
-      );
-
-      dayElement.disabled = true;
-
-    }
-
-
-    /*
-      Si hoy ya fue registrado,
-      también queda bloqueado.
-    */
-
-    if (
-      isToday(date) &&
-      records[key]
-    ) {
-
-      dayElement.disabled =
-        true;
-
-    }
-
-
-    dayElement.addEventListener(
-      "click",
-      () =>
-        selectDay(date)
-    );
-
-
-    calendar.appendChild(
-      dayElement
-    );
-
-  }
-
-
-  updateMonthStats();
-
+    updateMonthStats();
 }
 
 
@@ -487,197 +598,183 @@ function renderCalendar() {
 
 function selectDay(date) {
 
-  today =
-    getToday();
+    const key =
+        getDateKey(date);
 
 
-  const key =
-    getDateKey(date);
+    if (
+        !isToday(date)
+    ) {
+
+        showToast(
+            "🔒 Solo puedes registrar el día de hoy."
+        );
+
+        return;
+    }
 
 
-  /*
-    Solo se permite HOY.
-  */
+    if (
+        records[key]
+    ) {
 
-  if (
-    !isToday(date)
-  ) {
+        const text =
+            records[key].status ===
+            "success"
+                ? "✅ cumplido"
+                : "❌ no cumplido";
 
-    showToast(
-      "🔒 Solo puedes registrar el día de hoy."
+
+        showToast(
+            `🔒 Este día ya está bloqueado como ${text}.`
+        );
+
+        return;
+    }
+
+
+    selectedDate =
+        new Date(date);
+
+
+    modalDate.textContent =
+        date.toLocaleDateString(
+            "es-GT",
+            {
+                weekday: "long",
+                day: "numeric",
+                month: "long",
+                year: "numeric"
+            }
+        );
+
+
+    modal.classList.remove(
+        "hidden"
     );
-
-    return;
-
-  }
-
-
-  /*
-    Si ya fue registrado,
-    nunca se puede cambiar.
-  */
-
-  if (
-    records[key]
-  ) {
-
-    const text =
-      records[key].status ===
-      "success"
-        ? "✅ cumplido"
-        : "❌ no cumplido";
-
-
-    showToast(
-      `🔒 Este día ya está bloqueado como ${text}.`
-    );
-
-    return;
-
-  }
-
-
-  selectedDate =
-    new Date(date);
-
-
-  modalDate.textContent =
-    date.toLocaleDateString(
-      "es-GT",
-      {
-        weekday: "long",
-        day: "numeric",
-        month: "long",
-        year: "numeric"
-      }
-    );
-
-
-  modal.classList.remove(
-    "hidden"
-  );
-
 }
 
 
 /* =========================
-   REGISTRAR RESULTADO
+   REGISTRAR DÍA
 ========================= */
 
-function registerDay(status) {
+async function registerDay(
+    status
+) {
 
-  today =
-    getToday();
+    if (
+        !selectedDate
+    ) {
 
-
-  if (
-    !selectedDate
-  ) {
-
-    return;
-
-  }
+        return;
+    }
 
 
-  /*
-    PROTECCIÓN EXTRA:
+    if (
+        !isToday(
+            selectedDate
+        )
+    ) {
 
-    aunque se intente ejecutar
-    desde consola, solamente
-    puede registrarse hoy.
-  */
+        showToast(
+            "🔒 Solo puedes registrar el día de hoy."
+        );
 
-  if (
-    !isToday(selectedDate)
-  ) {
+        closeModal();
 
-    showToast(
-      "🔒 Solo puedes registrar el día de hoy."
-    );
+        return;
+    }
+
+
+    const key =
+        getDateKey(
+            selectedDate
+        );
+
+
+    if (
+        records[key]
+    ) {
+
+        showToast(
+            "🔒 Ese día ya fue registrado."
+        );
+
+        closeModal();
+
+        return;
+    }
+
+
+    if (
+        status !== "success" &&
+        status !== "failed"
+    ) {
+
+        return;
+    }
+
+
+    successBtn.disabled =
+        true;
+
+    failedBtn.disabled =
+        true;
+
+
+    const saved =
+        await saveRecord(
+            selectedDate,
+            status
+        );
+
+
+    successBtn.disabled =
+        false;
+
+    failedBtn.disabled =
+        false;
+
+
+    if (
+        !saved
+    ) {
+
+        return;
+    }
+
+
+    records[key] = {
+        status: status,
+        registeredAt:
+            new Date()
+                .toISOString()
+    };
+
 
     closeModal();
 
-    return;
+    renderCalendar();
 
-  }
-
-
-  const key =
-    getDateKey(
-      selectedDate
-    );
+    updateStats();
 
 
-  /*
-    No modificar un registro existente.
-  */
+    if (
+        status ===
+        "success"
+    ) {
 
-  if (
-    records[key]
-  ) {
+        showToast(
+            "🔥 Día cumplido. ¡Sigue así!"
+        );
 
-    showToast(
-      "🔒 Ese día ya fue registrado."
-    );
+    } else {
 
-    closeModal();
-
-    return;
-
-  }
-
-
-  /*
-    Validar estado.
-  */
-
-  if (
-    status !== "success" &&
-    status !== "failed"
-  ) {
-
-    return;
-
-  }
-
-
-  records[key] = {
-
-    status: status,
-
-    registeredAt:
-      new Date()
-        .toISOString()
-
-  };
-
-
-  saveRecords();
-
-  closeModal();
-
-  renderCalendar();
-
-  updateStats();
-
-
-  if (
-    status ===
-    "success"
-  ) {
-
-    showToast(
-      "🔥 Día cumplido. ¡Sigue así!"
-    );
-
-  } else {
-
-    showToast(
-      "Registrado. Mañana tienes otra oportunidad."
-    );
-
-  }
-
+        showToast(
+            "Registrado. Mañana tienes otra oportunidad."
+        );
+    }
 }
 
 
@@ -687,53 +784,50 @@ function registerDay(status) {
 
 function closeModal() {
 
-  modal.classList.add(
-    "hidden"
-  );
+    modal.classList.add(
+        "hidden"
+    );
 
-  selectedDate = null;
-
+    selectedDate = null;
 }
 
 
 successBtn.addEventListener(
-  "click",
-  () =>
-    registerDay(
-      "success"
-    )
+    "click",
+    () =>
+        registerDay(
+            "success"
+        )
 );
 
 
 failedBtn.addEventListener(
-  "click",
-  () =>
-    registerDay(
-      "failed"
-    )
+    "click",
+    () =>
+        registerDay(
+            "failed"
+        )
 );
 
 
 closeModalBtn.addEventListener(
-  "click",
-  closeModal
+    "click",
+    closeModal
 );
 
 
 modal.addEventListener(
-  "click",
-  event => {
+    "click",
+    event => {
 
-    if (
-      event.target ===
-      modal
-    ) {
+        if (
+            event.target ===
+            modal
+        ) {
 
-      closeModal();
-
+            closeModal();
+        }
     }
-
-  }
 );
 
 
@@ -742,149 +836,140 @@ modal.addEventListener(
 ========================= */
 
 prevMonthBtn.addEventListener(
-  "click",
-  () => {
+    "click",
+    () => {
 
-    currentMonth--;
+        currentMonth--;
 
-    if (
-      currentMonth < 0
-    ) {
+        if (
+            currentMonth < 0
+        ) {
 
-      currentMonth = 11;
+            currentMonth = 11;
 
-      currentYear--;
+            currentYear--;
+        }
 
+        renderCalendar();
     }
-
-    renderCalendar();
-
-  }
 );
 
 
 nextMonthBtn.addEventListener(
-  "click",
-  () => {
+    "click",
+    () => {
 
-    currentMonth++;
+        currentMonth++;
 
-    if (
-      currentMonth > 11
-    ) {
+        if (
+            currentMonth > 11
+        ) {
 
-      currentMonth = 0;
+            currentMonth = 0;
 
-      currentYear++;
+            currentYear++;
+        }
 
+        renderCalendar();
     }
-
-    renderCalendar();
-
-  }
 );
 
 
 /* =========================
-   ESTADÍSTICAS GENERALES
+   ESTADÍSTICAS
 ========================= */
 
 function updateStats() {
 
-  const keys =
-    Object
-      .keys(records)
-      .sort();
+    const keys =
+        Object
+            .keys(records)
+            .sort();
 
 
-  let success = 0;
+    let success = 0;
 
-  let failed = 0;
+    let failed = 0;
 
 
-  keys.forEach(
-    key => {
+    keys.forEach(
+        key => {
 
-      if (
-        records[key].status ===
-        "success"
-      ) {
+            if (
+                records[key].status ===
+                "success"
+            ) {
 
-        success++;
+                success++;
+            }
 
-      }
 
-      if (
-        records[key].status ===
-        "failed"
-      ) {
+            if (
+                records[key].status ===
+                "failed"
+            ) {
 
-        failed++;
+                failed++;
+            }
+        }
+    );
 
-      }
 
+    successDaysElement.textContent =
+        success;
+
+    failedDaysElement.textContent =
+        failed;
+
+    totalRegistered.textContent =
+        success + failed;
+
+
+    let percentage = 0;
+
+
+    if (
+        success + failed > 0
+    ) {
+
+        percentage =
+            Math.round(
+                (
+                    success /
+                    (
+                        success +
+                        failed
+                    )
+                ) *
+                100
+            );
     }
-  );
 
 
-  successDaysElement.textContent =
-    success;
-
-  failedDaysElement.textContent =
-    failed;
-
-  totalRegistered.textContent =
-    success + failed;
+    successPercentage.textContent =
+        `${percentage}%`;
 
 
-  let percentage = 0;
+    const currentStreak =
+        calculateCurrentStreak();
+
+    const bestStreak =
+        calculateBestStreak();
 
 
-  if (
-    success + failed > 0
-  ) {
+    currentStreakElement.textContent =
+        currentStreak;
 
-    percentage =
-      Math.round(
-        (
-          success /
-          (
-            success +
-            failed
-          )
-        ) *
-        100
-      );
-
-  }
+    bestStreakElement.textContent =
+        bestStreak;
 
 
-  successPercentage.textContent =
-    `${percentage}%`;
+    updateAchievements(
+        bestStreak
+    );
 
 
-  const currentStreak =
-    calculateCurrentStreak();
-
-
-  const bestStreak =
-    calculateBestStreak();
-
-
-  currentStreakElement.textContent =
-    currentStreak;
-
-  bestStreakElement.textContent =
-    bestStreak;
-
-
-  updateAchievements(
-    bestStreak
-  );
-
-
-  setMotivation();
-
+    setMotivation();
 }
 
 
@@ -894,68 +979,57 @@ function updateStats() {
 
 function calculateCurrentStreak() {
 
-  today =
-    getToday();
+    today =
+        getToday();
 
 
-  let streak = 0;
+    let streak = 0;
 
 
-  let date =
-    new Date(today);
+    let date =
+        new Date(today);
 
 
-  const todayKey =
-    getDateKey(date);
-
-
-  /*
-    Si hoy todavía no fue
-    registrado, comenzamos
-    contando desde ayer.
-  */
-
-  if (
-    !records[todayKey]
-  ) {
-
-    date.setDate(
-      date.getDate() - 1
-    );
-
-  }
-
-
-  while (true) {
-
-    const key =
-      getDateKey(date);
+    const todayKey =
+        getDateKey(date);
 
 
     if (
-      records[key] &&
-      records[key].status ===
-        "success"
+        !records[todayKey]
     ) {
 
-      streak++;
-
-
-      date.setDate(
-        date.getDate() - 1
-      );
-
-    } else {
-
-      break;
-
+        date.setDate(
+            date.getDate() - 1
+        );
     }
 
-  }
+
+    while (true) {
+
+        const key =
+            getDateKey(date);
 
 
-  return streak;
+        if (
+            records[key] &&
+            records[key].status ===
+            "success"
+        ) {
 
+            streak++;
+
+            date.setDate(
+                date.getDate() - 1
+            );
+
+        } else {
+
+            break;
+        }
+    }
+
+
+    return streak;
 }
 
 
@@ -965,84 +1039,80 @@ function calculateCurrentStreak() {
 
 function calculateBestStreak() {
 
-  const successfulDates =
-    Object
-      .keys(records)
-      .filter(
-        key =>
-          records[key].status ===
-          "success"
-      )
-      .sort();
-
-
-  if (
-    successfulDates.length === 0
-  ) {
-
-    return 0;
-
-  }
-
-
-  let best = 1;
-
-  let current = 1;
-
-
-  for (
-    let i = 1;
-    i <
-    successfulDates.length;
-    i++
-  ) {
-
-    const previous =
-      createDateFromKey(
-        successfulDates[i - 1]
-      );
-
-
-    const currentDate =
-      createDateFromKey(
-        successfulDates[i]
-      );
-
-
-    const difference =
-      Math.round(
-        (
-          currentDate -
-          previous
-        ) /
-        86400000
-      );
+    const successfulDates =
+        Object
+            .keys(records)
+            .filter(
+                key =>
+                    records[key].status ===
+                    "success"
+            )
+            .sort();
 
 
     if (
-      difference === 1
+        successfulDates.length ===
+        0
     ) {
 
-      current++;
-
-
-      best =
-        Math.max(
-          best,
-          current
-        );
-
-    } else {
-
-      current = 1;
-
+        return 0;
     }
 
-  }
+
+    let best = 1;
+
+    let current = 1;
 
 
-  return best;
+    for (
+        let i = 1;
+        i <
+        successfulDates.length;
+        i++
+    ) {
 
+        const previous =
+            createDateFromKey(
+                successfulDates[i - 1]
+            );
+
+
+        const currentDate =
+            createDateFromKey(
+                successfulDates[i]
+            );
+
+
+        const difference =
+            Math.round(
+                (
+                    currentDate -
+                    previous
+                ) /
+                86400000
+            );
+
+
+        if (
+            difference === 1
+        ) {
+
+            current++;
+
+            best =
+                Math.max(
+                    best,
+                    current
+                );
+
+        } else {
+
+            current = 1;
+        }
+    }
+
+
+    return best;
 }
 
 
@@ -1052,143 +1122,126 @@ function calculateBestStreak() {
 
 function updateMonthStats() {
 
-  today =
-    getToday();
+    today =
+        getToday();
 
 
-  const totalDays =
-    new Date(
-      currentYear,
-      currentMonth + 1,
-      0
-    ).getDate();
+    const totalDays =
+        new Date(
+            currentYear,
+            currentMonth + 1,
+            0
+        ).getDate();
 
 
-  /*
-    Para meses pasados,
-    contamos todos los días.
-
-    Para el mes actual,
-    solamente hasta hoy.
-
-    Para meses futuros,
-    0.
-  */
-
-  let possibleDays =
-    totalDays;
+    let possibleDays =
+        totalDays;
 
 
-  const viewingCurrentMonth =
-    currentYear ===
-      today.getFullYear() &&
-    currentMonth ===
-      today.getMonth();
+    const viewingCurrentMonth =
+        currentYear ===
+            today.getFullYear() &&
+        currentMonth ===
+            today.getMonth();
 
 
-  const monthStart =
-    new Date(
-      currentYear,
-      currentMonth,
-      1
+    const monthStart =
+        new Date(
+            currentYear,
+            currentMonth,
+            1
+        );
+
+
+    monthStart.setHours(
+        0,
+        0,
+        0,
+        0
     );
 
 
-  monthStart.setHours(
-    0,
-    0,
-    0,
-    0
-  );
+    const viewingFutureMonth =
+        monthStart > today;
 
 
-  const viewingFutureMonth =
-    monthStart > today;
+    if (
+        viewingCurrentMonth
+    ) {
+
+        possibleDays =
+            today.getDate();
+    }
 
 
-  if (
-    viewingCurrentMonth
-  ) {
+    if (
+        viewingFutureMonth
+    ) {
 
-    possibleDays =
-      today.getDate();
-
-  }
+        possibleDays = 0;
+    }
 
 
-  if (
-    viewingFutureMonth
-  ) {
-
-    possibleDays = 0;
-
-  }
+    let successful = 0;
 
 
-  let successful = 0;
+    Object
+        .keys(records)
+        .forEach(
+            key => {
+
+                const date =
+                    createDateFromKey(
+                        key
+                    );
 
 
-  Object
-    .keys(records)
-    .forEach(
-      key => {
+                if (
+                    date.getFullYear() ===
+                        currentYear &&
+                    date.getMonth() ===
+                        currentMonth &&
+                    records[key].status ===
+                        "success"
+                ) {
 
-        const date =
-          createDateFromKey(
-            key
-          );
-
-
-        if (
-          date.getFullYear() ===
-            currentYear &&
-          date.getMonth() ===
-            currentMonth &&
-          records[key].status ===
-            "success"
-        ) {
-
-          successful++;
-
-        }
-
-      }
-    );
+                    successful++;
+                }
+            }
+        );
 
 
-  let percentage = 0;
+    let percentage = 0;
 
 
-  if (
-    possibleDays > 0
-  ) {
+    if (
+        possibleDays > 0
+    ) {
 
-    percentage =
-      Math.round(
-        (
-          successful /
-          possibleDays
-        ) *
-        100
-      );
-
-  }
-
-
-  progressText.textContent =
-    `${successful}/${possibleDays} · ${percentage}%`;
+        percentage =
+            Math.round(
+                (
+                    successful /
+                    possibleDays
+                ) *
+                100
+            );
+    }
 
 
-  progressFill.style.width =
-    `${Math.min(
-      percentage,
-      100
-    )}%`;
+    progressText.textContent =
+        `${successful}/${possibleDays} · ${percentage}%`;
 
 
-  monthSubtitle.textContent =
-    `${successful} días sin azúcar`;
+    progressFill.style.width =
+        `${Math.min(
+            percentage,
+            100
+        )}%`;
 
+
+    monthSubtitle.textContent =
+        `${successful} días sin azúcar`;
 }
 
 
@@ -1197,62 +1250,60 @@ function updateMonthStats() {
 ========================= */
 
 function updateAchievements(
-  bestStreak
+    bestStreak
 ) {
 
-  achievementsContainer.innerHTML =
-    "";
+    achievementsContainer.innerHTML =
+        "";
 
 
-  achievements.forEach(
-    achievement => {
+    achievements.forEach(
+        achievement => {
 
-      const unlocked =
-        bestStreak >=
-        achievement.days;
-
-
-      const element =
-        document.createElement(
-          "div"
-        );
+            const unlocked =
+                bestStreak >=
+                achievement.days;
 
 
-      element.className =
-        `achievement ${
-          unlocked
-            ? ""
-            : "locked"
-        }`;
+            const element =
+                document.createElement(
+                    "div"
+                );
 
 
-      element.innerHTML = `
-
-        <span
-          class="achievement-icon"
-        >
-          ${achievement.icon}
-        </span>
-
-        <strong>
-          ${achievement.title}
-        </strong>
-
-        <small>
-          ${achievement.days} días
-        </small>
-
-      `;
+            element.className =
+                `achievement ${
+                    unlocked
+                        ? ""
+                        : "locked"
+                }`;
 
 
-      achievementsContainer
-        .appendChild(
-          element
-        );
+            element.innerHTML = `
 
-    }
-  );
+                <span
+                    class="achievement-icon"
+                >
+                    ${achievement.icon}
+                </span>
 
+                <strong>
+                    ${achievement.title}
+                </strong>
+
+                <small>
+                    ${achievement.days} días
+                </small>
+
+            `;
+
+
+            achievementsContainer
+                .appendChild(
+                    element
+                );
+        }
+    );
 }
 
 
@@ -1262,41 +1313,39 @@ function updateAchievements(
 
 function setMotivation() {
 
-  const date =
-    getToday();
+    const date =
+        getToday();
 
 
-  const key =
-    `${date.getFullYear()}-${
-      date.getMonth()
-    }-${
-      date.getDate()
-    }`;
+    const key =
+        `${date.getFullYear()}-${
+            date.getMonth()
+        }-${
+            date.getDate()
+        }`;
 
 
-  let hash = 0;
+    let hash = 0;
 
 
-  for (
-    let i = 0;
-    i < key.length;
-    i++
-  ) {
+    for (
+        let i = 0;
+        i < key.length;
+        i++
+    ) {
 
-    hash +=
-      key.charCodeAt(i);
-
-  }
-
-
-  const index =
-    hash %
-    motivations.length;
+        hash +=
+            key.charCodeAt(i);
+    }
 
 
-  motivation.textContent =
-    motivations[index];
+    const index =
+        hash %
+        motivations.length;
 
+
+    motivation.textContent =
+        motivations[index];
 }
 
 
@@ -1305,211 +1354,174 @@ function setMotivation() {
 ========================= */
 
 function showToast(
-  message
+    message
 ) {
 
-  toast.textContent =
-    message;
+    toast.textContent =
+        message;
 
 
-  toast.classList.add(
-    "show"
-  );
-
-
-  clearTimeout(
-    showToast.timeout
-  );
-
-
-  showToast.timeout =
-    setTimeout(
-      () => {
-
-        toast.classList.remove(
-          "show"
-        );
-
-      },
-      2500
+    toast.classList.add(
+        "show"
     );
 
+
+    clearTimeout(
+        showToast.timeout
+    );
+
+
+    showToast.timeout =
+        setTimeout(
+            () => {
+
+                toast.classList.remove(
+                    "show"
+                );
+
+            },
+            2500
+        );
 }
 
 
 /* =========================
-   TEMA OSCURO
+   TEMA
 ========================= */
 
 function loadTheme() {
 
-  const theme =
-    localStorage.getItem(
-      "sugarFreeTheme"
-    );
+    const theme =
+        localStorage.getItem(
+            "sugarFreeTheme"
+        );
 
 
-  if (
-    theme ===
-    "dark"
-  ) {
+    if (
+        theme === "dark"
+    ) {
 
-    document.body.classList.add(
-      "dark"
-    );
+        document.body.classList.add(
+            "dark"
+        );
 
-    themeBtn.textContent =
-      "☀️";
+        themeBtn.textContent =
+            "☀️";
 
-  } else {
+    } else {
 
-    themeBtn.textContent =
-      "🌙";
-
-  }
-
+        themeBtn.textContent =
+            "🌙";
+    }
 }
 
 
 themeBtn.addEventListener(
-  "click",
-  () => {
+    "click",
+    () => {
 
-    document.body.classList.toggle(
-      "dark"
-    );
-
-
-    const dark =
-      document.body.classList.contains(
-        "dark"
-      );
+        document.body.classList.toggle(
+            "dark"
+        );
 
 
-    localStorage.setItem(
-      "sugarFreeTheme",
-      dark
-        ? "dark"
-        : "light"
-    );
+        const dark =
+            document.body.classList.contains(
+                "dark"
+            );
 
 
-    themeBtn.textContent =
-      dark
-        ? "☀️"
-        : "🌙";
+        localStorage.setItem(
+            "sugarFreeTheme",
+            dark
+                ? "dark"
+                : "light"
+        );
 
-  }
+
+        themeBtn.textContent =
+            dark
+                ? "☀️"
+                : "🌙";
+    }
 );
 
 
 /* =========================
-   SERVICE WORKER
+   CAMBIO DE DÍA
 ========================= */
-
-function registerServiceWorker() {
-
-  if (
-    "serviceWorker"
-    in navigator
-  ) {
-
-    window.addEventListener(
-      "load",
-      () => {
-
-        navigator
-          .serviceWorker
-          .register(
-            "./sw.js"
-          )
-          .catch(
-            error => {
-
-              console.log(
-                "Service Worker:",
-                error
-              );
-
-            }
-          );
-
-      }
-    );
-
-  }
-
-}
-
-
-/* =========================
-   ACTUALIZAR SI CAMBIA EL DÍA
-========================= */
-
-/*
-  Si dejas la PWA abierta durante
-  la medianoche, revisamos cada
-  minuto si cambió la fecha.
-*/
 
 let lastKnownDate =
-  getDateKey(
-    getToday()
-  );
+    getDateKey(
+        getToday()
+    );
 
 
 setInterval(
-  () => {
+    () => {
 
-    const currentDateKey =
-      getDateKey(
-        getToday()
-      );
-
-
-    if (
-      currentDateKey !==
-      lastKnownDate
-    ) {
-
-      lastKnownDate =
-        currentDateKey;
-
-      today =
-        getToday();
+        const currentDateKey =
+            getDateKey(
+                getToday()
+            );
 
 
-      /*
-        Llevar automáticamente
-        el calendario al nuevo día.
-      */
+        if (
+            currentDateKey !==
+            lastKnownDate
+        ) {
 
-      currentYear =
-        today.getFullYear();
+            lastKnownDate =
+                currentDateKey;
 
-      currentMonth =
-        today.getMonth();
+            today =
+                getToday();
+
+            currentYear =
+                today.getFullYear();
+
+            currentMonth =
+                today.getMonth();
 
 
-      renderCalendar();
+            renderCalendar();
 
-      updateStats();
+            updateStats();
+        }
 
-    }
-
-  },
-  60000
+    },
+    60000
 );
 
 
 /* =========================
-   INICIO
+   INICIAR APP
 ========================= */
 
-loadTheme();
+async function initApp() {
 
-renderCalendar();
+    loadTheme();
 
-updateStats();
+    setMotivation();
 
-registerServiceWorker();
+
+    currentUser =
+        await getCurrentUser();
+
+
+    if (
+        !currentUser
+    ) {
+
+        window.location.href =
+            "./login.html";
+
+        return;
+    }
+
+
+    await loadRecords();
+}
+
+
+initApp();
