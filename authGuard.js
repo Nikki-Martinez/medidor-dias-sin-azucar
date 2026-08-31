@@ -41,17 +41,6 @@ async function protegerPagina() {
         return;
     }
 
-
-    /*
-    Usuario autenticado.
-    */
-
-    console.log(
-        "Usuario autenticado:",
-        session.user.email
-    );
-
-
     mostrarUsuario(
         session.user
     );
